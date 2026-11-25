@@ -41,6 +41,9 @@ import pos.com.common.exception.httpstatus.ProxyException;
 import pos.com.common.exception.httpstatus.TemporaryException;
 import pos.com.common.exception.httpstatus.UnauthorizedException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -155,6 +158,16 @@ class ExceptionFunctionsTest {
         new ApplicationContextRunner()
                 .withConfiguration(AutoConfigurations.of(CommonAutoConfiguration.class))
                 .run(context -> assertThat(context).hasSingleBean(ExceptionAdvices.class));
+    }
+
+    @Test
+    void autoConfigurationImportsFileContainsCommonAutoConfiguration() throws IOException {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(
+                "META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports")) {
+            assertNotNull(in);
+            String content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            assertTrue(content.contains("pos.com.common.config.CommonAutoConfiguration"));
+        }
     }
 
     @Test
